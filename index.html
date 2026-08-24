@@ -8,6 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
       display: flex;
@@ -16,39 +20,129 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
-      background-color: #89CFF0;
+      padding: 30px 15px;
       gap: 15px;
+
+      /* Pudrowy róż */
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.65) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.45) 0 1.5px, transparent 3px),
+        radial-gradient(circle at 40% 75%, rgba(255,255,255,0.5) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 85%, rgba(255,255,255,0.4) 0 1.5px, transparent 3px),
+        linear-gradient(
+          135deg,
+          #f7c6d9 0%,
+          #f3b6cf 35%,
+          #f8cfe0 65%,
+          #efb0cb 100%
+        );
+
+      background-size:
+        180px 180px,
+        240px 240px,
+        210px 210px,
+        260px 260px,
+        100% 100%;
+
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Delikatna brokatowa poświata */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          circle at 30% 30%,
+          rgba(255,255,255,0.35),
+          transparent 25%
+        ),
+        radial-gradient(
+          circle at 75% 70%,
+          rgba(255,255,255,0.25),
+          transparent 30%
+        );
+
+      animation: shimmer 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes shimmer {
+      from {
+        opacity: 0.45;
+      }
+      to {
+        opacity: 0.9;
+      }
     }
 
     h1 {
       font-size: 48px;
       color: white;
       margin: 0;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      text-align: center;
+      text-shadow:
+        2px 2px 5px rgba(150, 60, 100, 0.25),
+        0 0 15px rgba(255,255,255,0.4);
+      position: relative;
+      z-index: 1;
     }
 
     h2 {
       font-family: 'Dancing Script', cursive;
       font-size: 28px;
       color: white;
-      margin-bottom: 30px;
+      margin: 0 0 30px 0;
       font-style: italic;
+      text-shadow: 1px 1px 4px rgba(150, 60, 100, 0.25);
+      position: relative;
+      z-index: 1;
     }
 
     button {
       padding: 15px 40px;
       font-size: 20px;
+      font-weight: bold;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      background-color: black;
+
+      background: black;
       color: white;
+
+      box-shadow:
+        0 5px 15px rgba(0,0,0,0.2),
+        0 0 15px rgba(255,255,255,0.25);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+      
+      position: relative;
+      z-index: 1;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 7px 20px rgba(0,0,0,0.25),
+        0 0 20px rgba(255,255,255,0.35);
+    }
+
+    button:active {
+      transform: translateY(1px);
     }
 
     .card {
       display: none;
       perspective: 1000px;
       cursor: pointer;
+      position: relative;
+      z-index: 1;
+      margin-top: 10px;
     }
 
     .card-inner {
@@ -69,17 +163,24 @@
       width: 100%;
       height: 100%;
       border-radius: 20px;
+
       backface-visibility: hidden;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       padding: 15px;
+
       box-sizing: border-box;
+
+      box-shadow:
+        0 10px 30px rgba(100, 30, 70, 0.2);
     }
 
     .card-front {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .card-front img {
@@ -94,80 +195,309 @@
       font-size: 22px;
       font-weight: bold;
       color: black;
+      text-align: center;
     }
 
     .card-back {
       background: black;
       color: white;
+
       transform: rotateY(180deg);
+
       font-family: 'Dancing Script', cursive;
       font-size: 22px;
       text-align: center;
+
+      padding: 30px;
+    }
+
+    /* Na telefon */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 25px;
+      }
+
+      .card-inner {
+        width: 250px;
+        height: 325px;
+      }
+
+      .card-front img {
+        width: 220px;
+        height: 220px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <h1>WYROCZNIA DELFICKA</h1>
+
   <h2>All the boys I've loved before</h2>
 
   <button id="losujBtn">LOSUJ</button>
 
   <div class="card" id="wynik">
     <div class="card-inner">
+
       <div class="card-front">
         <img id="zdjecie" src="" alt="">
         <div class="name" id="nazwa"></div>
       </div>
+
       <div class="card-back">
         <div id="znaczenie"></div>
       </div>
+
     </div>
   </div>
 
+
   <script>
+
     const osoby = [
-      { name: "SZYMEK", img: "szymek.JPG", meaning: "niesmialosc, pech, choroba, woda" },
-      { name: "RACIN", img: "racin.JPG", meaning: "dostatek, powodzenie, sport, milosc" },
-      { name: "ŻUK", img: "zuk.jpg", meaning: "madrosc, optymizm, szczescie" },
-      { name: "BARTEK SZCZEPAN", img: "szczepan.jpg", meaning: "zakochanie, spokoj ducha, jezus" },
-      { name: "BORZYM", img: "borzym.jpg", meaning: "pech, brzydota, chaos" },
-      { name: "KSEJ", img: "ksej.jpg", meaning: "ambicja, sport, pulapka, milosc" },
-      { name: "WOJTINI", img: "wojtini.jpg", meaning: "beztroska, narkotyki, radosc, nieszzczescie" },
-      { name: "SZYMON PEDAŁ KURWA", img: "spk.jpg", meaning: "nowa droga, strach, taniec" },
-      { name: "MARCEL CHWAST", img: "cwel.jpg", meaning: "narcyzm, high life" },
-      { name: "KULCZYK", img: "kulczyk.JPG", meaning: "strach, pech, brak poczucia wlasnej wartosci" },
-      { name: "OLAF BOREK", img: "borek.JPG", meaning: "iluzja, bitwa, zakochanie" },
-      { name: "PABLO", img: "pablo.JPG", meaning: "sabotaz, pech, klotnia" },
-      { name: "KSAWIER", img: "ksawier.JPG", meaning: "plotki, konflikt, nienawisc" },
-      { name: "ANITA", img: "IMG_0842.jpeg", meaning: "obluda, zdrada, plotki" },
-      { name: "NIKOLA", img: "IMG_0841.jpeg", meaning: "chaos, impreza, wiedza" },
-      { name: "OLEK DRAŻA", img: "olek.JPG", meaning: "tajemnica, nonszalancja, spokoj" },
-      { name: "KORNEL", img: "IMG_1819.jpeg", meaning: "kpina, wiedza, pogarda" },
-      { name: "MAGDA", img: "magda.jpg", meaning: "zazdrosc, plotki, milosc" },
-      { name: "LIWKA", img: "liwia.JPG", meaning: "nieufnosc, spisek, partner in crime motive" },
-      { name: "KINGA", img: "kinga.JPG", meaning: "brud, zaalugiwanie lepiej" },
-      { name: "FIFI", img: "fifi.JPG", meaning: "komedia, absurd goni abusrd" },
-      { name: "WLADYSLAW", img: "wladyslaw.JPG", meaning: "wojna, sukces, narcyzm" },
-      { name: "KARMEL", img: "karmel.JPG", meaning: "pogarda, trauma, skrytosc" },
-      { name: "BARTEK SUNDAY", img: "sunday.jpg", meaning: "szczescie, spokoj, dobrostan" },
-      { name: "RĘBISZ", img: "rebisz.JPG", meaning: "zal, pragnienie, skrytosc" },
-      { name: "RAFAŁ", img: "rafal.jpg", meaning: "narcyzm, chaos, bogsctwo" },
-      { name: "CHMIELU", img: "kuba.jpg", meaning: "glupota, zaniedbanie" },
-      { name: "ALICJA", img: "IMG_1822.jpeg", meaning: "zdrada, klamstwo, deterioracja" },
-      { name: "HANIA LIS", img: "IMG_0845.jpeg", meaning: "nadzieja, milosc, szczescie" },
-      { name: "TRZASKOWSKA", img: "IMG_1847.jpeg", meaning: "bogactwo, narcyzm, wycieczka" },
-      { name: "WIDANSKI", img: "IMG_1868.jpeg", meaning: "lmao"}
-      { name: "FRANEK", img: "franek.JPG", meaning: "" },
-      { name: "STASIU", img: "Stasiu.JPG", meaning: "" },
-      { name: "DEWIKO", img: "dewiko.JPG", meaning: "" },
-      { name: "KOSA", img: "kosa.JPG", meaning: "" },
-      { name: "WAMPIR", img: "wampir.JPG", meaning: "" },
-      { name: "EMILKA", img: "emilia.JPG", meaning: "" },
-      { name: "BORYS SZCZUR", img: "szczur.JPG", meaning: "" },
-      { name: "MASKLAK", img: "maślak.JPG", meaning: "" }
-      
+
+      {
+        name: "SZYMEK",
+        img: "szymek.JPG",
+        meaning: "nieśmiałość, pech, choroba, woda"
+      },
+
+      {
+        name: "RACIN",
+        img: "racin.JPG",
+        meaning: "dostatek, powodzenie, sport, miłość"
+      },
+
+      {
+        name: "ŻUK",
+        img: "zuk.jpg",
+        meaning: "mądrość, optymizm, szczęście"
+      },
+
+      {
+        name: "BARTEK SZCZEPAN",
+        img: "szczepan.jpg",
+        meaning: "zakochanie, spokój ducha, Jezus"
+      },
+
+      {
+        name: "BORZYM",
+        img: "borzym.jpg",
+        meaning: "pech, brzydota, chaos"
+      },
+
+      {
+        name: "KSEJ",
+        img: "ksej.jpg",
+        meaning: "ambicja, sport, pułapka, miłość"
+      },
+
+      {
+        name: "WOJTINI",
+        img: "wojtini.jpg",
+        meaning: "beztroska, narkotyki, radość, nieszczęście"
+      },
+
+      {
+        name: "SZYMON PEDAŁ KURWA",
+        img: "spk.jpg",
+        meaning: "nowa droga, strach, taniec"
+      },
+
+      {
+        name: "MARCEL CHWAST",
+        img: "cwel.jpg",
+        meaning: "narcyzm, high life"
+      },
+
+      {
+        name: "KULCZYK",
+        img: "kulczyk.JPG",
+        meaning: "strach, pech, brak poczucia własnej wartości"
+      },
+
+      {
+        name: "OLAF BOREK",
+        img: "borek.JPG",
+        meaning: "iluzja, bitwa, zakochanie"
+      },
+
+      {
+        name: "PABLO",
+        img: "pablo.JPG",
+        meaning: "sabotaż, pech, kłótnia"
+      },
+
+      {
+        name: "KSAWIER",
+        img: "ksawier.JPG",
+        meaning: "plotki, konflikt, nienawiść"
+      },
+
+      {
+        name: "ANITA",
+        img: "IMG_0842.jpeg",
+        meaning: "obłuda, zdrada, plotki"
+      },
+
+      {
+        name: "NIKOLA",
+        img: "IMG_0841.jpeg",
+        meaning: "chaos, impreza, wiedza"
+      },
+
+      {
+        name: "OLEK DRAŻA",
+        img: "olek.JPG",
+        meaning: "tajemnica, nonszalancja, spokój"
+      },
+
+      {
+        name: "KORNEL",
+        img: "IMG_1819.jpeg",
+        meaning: "kpina, wiedza, pogarda"
+      },
+
+      {
+        name: "MAGDA",
+        img: "magda.jpg",
+        meaning: "zazdrość, plotki, miłość"
+      },
+
+      {
+        name: "LIWKA",
+        img: "liwia.JPG",
+        meaning: "nieufność, spisek, partner in crime"
+      },
+
+      {
+        name: "KINGA",
+        img: "kinga.JPG",
+        meaning: "brud, zasługiwanie na lepiej"
+      },
+
+      {
+        name: "FIFI",
+        img: "fifi.JPG",
+        meaning: "komedia, absurd goni absurd"
+      },
+
+      {
+        name: "WLADYSLAW",
+        img: "wladyslaw.JPG",
+        meaning: "wojna, sukces, narcyzm"
+      },
+
+      {
+        name: "KARMEL",
+        img: "karmel.JPG",
+        meaning: "pogarda, trauma, skrytość"
+      },
+
+      {
+        name: "BARTEK SUNDAY",
+        img: "sunday.jpg",
+        meaning: "szczęście, spokój, dobrostan"
+      },
+
+      {
+        name: "RĘBISZ",
+        img: "rebisz.JPG",
+        meaning: "żal, pragnienie, skrytość"
+      },
+
+      {
+        name: "RAFAŁ",
+        img: "rafal.jpg",
+        meaning: "narcyzm, chaos, bogactwo"
+      },
+
+      {
+        name: "CHMIELU",
+        img: "kuba.jpg",
+        meaning: "głupota, zaniedbanie"
+      },
+
+      {
+        name: "ALICJA",
+        img: "IMG_1822.jpeg",
+        meaning: "zdrada, kłamstwo, deterioracja"
+      },
+
+      {
+        name: "HANIA LIS",
+        img: "IMG_0845.jpeg",
+        meaning: "nadzieja, miłość, szczęście"
+      },
+
+      {
+        name: "TRZASKOWSKA",
+        img: "IMG_1847.jpeg",
+        meaning: "bogactwo, narcyzm, wycieczka"
+      },
+
+      {
+        name: "WIDANSKI",
+        img: "IMG_1868.jpeg",
+        meaning: "lmao"
+      },
+
+      {
+        name: "FRANEK",
+        img: "franek.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "STASIU",
+        img: "Stasiu.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "DEWIKO",
+        img: "dewiko.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "KOSA",
+        img: "kosa.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "WAMPIR",
+        img: "wampir.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "EMILKA",
+        img: "emilia.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "BORYS SZCZUR",
+        img: "szczur.JPG",
+        meaning: ""
+      },
+
+      {
+        name: "MASKLAK",
+        img: "maślak.JPG",
+        meaning: ""
+      }
+
     ];
+
 
     const btn = document.getElementById("losujBtn");
     const card = document.getElementById("wynik");
@@ -175,18 +505,30 @@
     const nameBox = document.getElementById("nazwa");
     const meaningBox = document.getElementById("znaczenie");
 
+
     btn.addEventListener("click", () => {
+
       const los = osoby[Math.floor(Math.random() * osoby.length)];
+
       img.src = los.img;
+      img.alt = los.name;
+
       nameBox.textContent = los.name;
       meaningBox.textContent = los.meaning;
+
       card.style.display = "block";
+
       card.classList.remove("flipped");
+
     });
 
+
     card.addEventListener("click", () => {
+
       card.classList.toggle("flipped");
+
     });
+
   </script>
 
 </body>
